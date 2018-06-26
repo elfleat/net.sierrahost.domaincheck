@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "Domain Check by SierraHost.net",
+    "slug": "shdomaincheck",
+    "privacy": "public",
+    "sdkVersion": "27.0.0",
+    "orientation": "portrait",
+    "description": "Slim tool to check domain availability quick and free.",
+    "version": "1.0",
+    "icon": "http://eliassierra.pro/domainchecker/icon.png",
+    "android": {
+      "package": "net.sierrahost.domaincheck"
+    }
+  }
+}

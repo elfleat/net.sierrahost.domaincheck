@@ -1,0 +1,7 @@
+export const headerGray = '#373634'
+export const primary = '#25c797'
+export const secondary = 'white'
+export const historyBar = '#444a4d'
+export const historyPillow = '#cfdde4'
+export const fail = '#ba1d33'
+export const lightGray = '#dddddd'
