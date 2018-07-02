@@ -6,7 +6,7 @@
     "sdkVersion": "27.0.0",
     "orientation": "portrait",
     "description": "Slim tool to check domain availability quick and free.",
-    "version": "1.1",
+    "version": "1.2",
     "icon": "http://eliassierra.pro/domainchecker/icon.png",
     "android": {
       "package": "net.sierrahost.domaincheck"
