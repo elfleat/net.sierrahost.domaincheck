@@ -1,6 +1,5 @@
-import React, { Component } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { Entypo } from '@expo/vector-icons'
+import React from 'react'
+import { View, Text, StyleSheet } from 'react-native'
 import { secondary } from '../utils/colors'
 
 export default function Tlds({ tlds, tldSwitch }){

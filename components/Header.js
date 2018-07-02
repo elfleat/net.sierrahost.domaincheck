@@ -1,15 +1,19 @@
 import React, { Component } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Animated, Easing } from 'react-native'
 import { headerGray, secondary, primary } from '../utils/colors'
-import { Entypo, Feather } from '@expo/vector-icons'
+import { Feather } from '@expo/vector-icons'
 
 import CheckBox from 'react-native-check-box'
 import SettingsButton from './SettingsButton'
-import Tlds from './Tlds'
  
 export default class Header extends Component {
     state = {
-        query: ''
+        query: '',
+        cleanQuery: ''
+    }
+    _handleTextChange = (char) => {
+        let cleanNewText = char.replace(/\W/g, '').toLowerCase()
+        return this.setState({ query: `${cleanNewText}` })
     }
     render() {
         const { settings, settingsSwitch, tlds, tldSwitch, search, loading } = this.props
@@ -25,18 +29,16 @@ export default class Header extends Component {
                 <View style={{ flexDirection : 'row' }}> 
                     <View style={{ paddingTop: 8, paddingLeft: 8, backgroundColor: secondary, flex: 2, borderRadius: 4 }}>
                         <View style={{flexDirection: 'row' }}>
-                            {!loading ? 
-                                <Feather 
-                                    name="search" 
-                                    color={headerGray}
-                                    size={24} style={{ width: 20, marginTop: 2 }} />
-
-                                : <Entypo name="back-in-time" color={headerGray} size={24} style={{ width: 20, marginTop: 0 }} />
-                            }
+                            <Feather 
+                                name="search" 
+                                color={headerGray}
+                                size={24} style={{ width: 20, marginTop: 2 }} />
                             <TextInput 
                                 style={{ flex: 2, fontSize: 18, paddingLeft: 5, marginRight: 10, paddingBottom: 10, marginLeft: 10 }}
-                                value={query} 
-                                onChangeText={(query) => this.setState({query})} />
+                                value={query}
+                                onChangeText={this._handleTextChange}
+                                onSubmitEditing={()=> search(query)}
+                            />
                         </View>
                     </View>
                     <SettingsButton settings={settings} onPress={settingsSwitch} />
