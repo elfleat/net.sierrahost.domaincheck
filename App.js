@@ -1,8 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Keyboard } from 'react-native'
 import Header from './components/Header'
 import HistoryMenu from './components/HistoryMenu'
 import CheckList from './components/CheckList'
+import Splash from './components/Splash'
+import Api from './utils/api'
 
 export default class App extends React.Component {
   state = {
@@ -22,7 +24,8 @@ export default class App extends React.Component {
       pl: false
     },
     activeHistory: '',
-    history: {}
+    history: {},
+    backendAwake: false
   }
 
   activateHistory = (domain) => {
@@ -58,7 +61,9 @@ export default class App extends React.Component {
       }
     })
 
-    this.setState({ history, activeHistory: pureDomain })
+    Keyboard.dismiss()
+
+    this.setState({ history, activeHistory: pureDomain, settings: false })
   }
   tldSwitch = (tld) => {
     let { tlds } = this.state;
@@ -69,8 +74,27 @@ export default class App extends React.Component {
     const { settings } = this.state
     this.setState({ settings: !settings })
   }
+
+  check = async () => {
+    const response = await Api.get(`check/${this.props.domainWithTld}`)
+    this.setState({
+        loading: false,
+        available: !response.data.isTaken
+    })
+}
+  
+  wakeUpBackend = async () => {
+    const response = await Api.get('wake-up')
+    if(response.data.success) this.setState({ backendAwake: true })
+  }
+
   render() {
-    const { settings, tlds, loading, history, activeHistory } = this.state
+    const { settings, tlds,  history, activeHistory, loading, backendAwake } = this.state
+
+    if(!backendAwake) {
+      this.wakeUpBackend()
+      return (<Splash />)
+    }
 
     return (
       <View style={styles.container}>

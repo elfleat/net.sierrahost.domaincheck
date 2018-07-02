@@ -21,8 +21,10 @@
   "dependencies": {
     "axios": "^0.18.0",
     "expo": "^27.0.1",
+    "install": "^0.12.1",
     "react": "16.3.1",
     "react-native": "~0.55.2",
-    "react-native-check-box": "^2.1.0"
+    "react-native-check-box": "^2.1.0",
+    "react-native-progress": "^3.5.0"
   }
 }
