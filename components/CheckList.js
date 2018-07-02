@@ -13,11 +13,22 @@ class DomainCheck extends Component {
         this.check()
     }
     check = async () => {
-        const response = await Api.get(`check/${this.props.domainWithTld}`)
-        this.setState({
-            loading: false,
-            available: !response.data.isTaken
+        const response = await Api.get(`check/${this.props.domainWithTld}`, { 
+            headers: { 
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
         })
+
+        if(response.data.success) {
+            this.setState({
+                loading: false,
+                available: !response.data.isTaken
+            })
+        } else {
+            this.check()
+        } 
     }
     render() {
         const { domainWithTld, rawDomain, tld } = this.props
@@ -44,11 +55,14 @@ class DomainCheck extends Component {
 export default class CheckList extends Component {
     render() {
         const { rawDomain, domainInfo } = this.props
-
+       
         return (
             <View>
                 <ScrollView>
-                    {Object.keys(domainInfo.tlds).map((tld) => (<DomainCheck key={tld} rawDomain={rawDomain} tld={tld} domainWithTld={`${rawDomain}.${tld}`} />))}
+                    {Object.keys(domainInfo.tlds).map((tld) => { 
+                        let domainWithTld = `${rawDomain}.${tld}`
+                        return (<DomainCheck key={domainWithTld} rawDomain={rawDomain} tld={tld} domainWithTld={domainWithTld} />)
+                    })}
                 </ScrollView>
             </View>
         )

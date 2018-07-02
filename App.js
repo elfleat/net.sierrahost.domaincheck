@@ -84,7 +84,7 @@ export default class App extends React.Component {
 }
   
   wakeUpBackend = async () => {
-    const response = await Api.get('wake-up')
+    const response = await Api.get('wake-up', { headers: { 'Cache-Control': 'no-cache' }})
     if(response.data.success) this.setState({ backendAwake: true })
   }
 
