@@ -10,6 +10,20 @@ export default class Header extends Component {
     state = {
         query: '',
     }
+
+    search = () => {
+        const { query } = this.state
+        const { search } = this.props
+
+        let lowerCaseQuery = query.toLowerCase()
+
+        if(!lowerCaseQuery.trim().length) {
+            return alert('Enter a Domain Name to Check');
+        }
+        
+        search(lowerCaseQuery)
+    }
+
     _handleTextChange = (char) => {
         let cleanNewText = char.replace(/\W/g, '')
         return this.setState({ query: `${cleanNewText}` })
@@ -17,7 +31,6 @@ export default class Header extends Component {
     render() {
         const { settings, settingsSwitch, tlds, tldSwitch, search, loading } = this.props
         const { query } = this.state 
-        let lowerCaseQuery = query.toLowerCase()
 
         return (
             <View style={styles.headerContainer}>
@@ -37,7 +50,7 @@ export default class Header extends Component {
                                 style={{ flex: 2, fontSize: 18, paddingLeft: 5, marginRight: 10, paddingBottom: 10, marginLeft: 10 }}
                                 value={query}
                                 onChangeText={this._handleTextChange}
-                                onSubmitEditing={()=> search(lowerCaseQuery)}
+                                onSubmitEditing={this.search}
                             />
                         </View>
                     </View>
@@ -60,7 +73,7 @@ export default class Header extends Component {
                     </View>}
 
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity onPress={()=> search(lowerCaseQuery)} style={[styles.button,{ backgroundColor: !loading ? primary : headerGray, opacity: !loading ? 1: 0.3 }]} disabled={loading}>
+                    <TouchableOpacity onPress={this.search} style={[styles.button,{ backgroundColor: !loading ? primary : headerGray, opacity: !loading ? 1: 0.3 }]} disabled={loading}>
                         <Text style={styles.buttonText}>Check</Text>
                     </TouchableOpacity>
                 </View>

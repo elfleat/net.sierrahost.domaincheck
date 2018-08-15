@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Keyboard } from 'react-native'
+import { StyleSheet, Text, View, Keyboard, AsyncStorage } from 'react-native'
 import Header from './components/Header'
 import HistoryMenu from './components/HistoryMenu'
 import CheckList from './components/CheckList'
@@ -14,9 +14,10 @@ export default class App extends React.Component {
       com: true,
       org: true,
       net: true,
+      biz: true,
       me: true,
       io: true,
-      tv: true,
+      tv: false,
       uk: false,
       br: false,
       jp: false,
@@ -26,6 +27,35 @@ export default class App extends React.Component {
     activeHistory: '',
     history: {},
     backendAwake: false
+  }
+
+  componentWillMount() {
+    this._getState();
+  }
+
+  componentDidUpdate() {
+    this._saveState();
+  }
+
+  _getState = async () => {
+    try {
+      let storedState = await AsyncStorage.getItem('domainCheckState');
+      storedState = JSON.parse(storedState);
+      if (storedState) {
+        this.setState(storedState)
+      }
+     } catch (error) {
+       // Error retrieving data
+     }
+  }
+
+  _saveState = async () => {
+    try {
+      const currentState = JSON.stringify(this.state);
+      await AsyncStorage.setItem('domainCheckState', currentState);
+    } catch (error) {
+      // Error Saving Data
+    }
   }
 
   activateHistory = (domain) => {
