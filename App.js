@@ -1,163 +1,62 @@
 import React from 'react';
-import { StyleSheet, Text, View, Keyboard, AsyncStorage } from 'react-native'
-import Header from './components/Header'
-import HistoryMenu from './components/HistoryMenu'
-import CheckList from './components/CheckList'
-import Splash from './components/Splash'
-import Api from './utils/api'
+import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { AppLoading, Asset, Font, Icon } from 'expo';
+import AppNavigator from './navigation/AppNavigator';
 
 export default class App extends React.Component {
   state = {
-    loading: false,
-    settings: false,
-    tlds: {
-      com: true,
-      org: true,
-      net: true,
-      biz: true,
-      me: true,
-      io: true,
-      tv: false,
-      uk: false,
-      br: false,
-      jp: false,
-      it: false,
-      pl: false
-    },
-    activeHistory: '',
-    history: {},
-    backendAwake: false
-  }
-
-  componentWillMount() {
-    this._getState();
-  }
-
-  componentDidUpdate() {
-    this._saveState();
-  }
-
-  _getState = async () => {
-    try {
-      let storedState = await AsyncStorage.getItem('domainCheckState');
-      storedState = JSON.parse(storedState);
-      if (storedState) {
-        this.setState(storedState)
-      }
-     } catch (error) {
-       // Error retrieving data
-     }
-  }
-
-  _saveState = async () => {
-    try {
-      const currentState = JSON.stringify(this.state);
-      await AsyncStorage.setItem('domainCheckState', currentState);
-    } catch (error) {
-      // Error Saving Data
-    }
-  }
-
-  activateHistory = (domain) => {
-    this.setState({ activeHistory: domain })
-  }
-
-  deleteHistory = (domain) => {
-    const { history } = this.state
-    let { activeHistory } = this.state
-
-    delete history[domain]
-    const historyEntries = Object.keys(history)
-
-    if(domain === activeHistory) {
-      activeHistory = historyEntries.length ? historyEntries[0] : null
-    }
-
-    this.setState({ history, activeHistory })
-  }
-
-  search = async (domain) => {
-    const { history, tlds } = this.state
-    const pureDomain = domain.indexOf('.') !== -1 ? domain.split('.')[0] : domain
-    
-    history[pureDomain] = {
-      loading: true,
-      tlds: {}
-    }
-
-    Object.keys(tlds).forEach((key) => {
-      if(tlds[key]) {
-        history[pureDomain]['tlds'][key] = 'pending';
-      }
-    })
-
-    Keyboard.dismiss()
-
-    this.setState({ history, activeHistory: pureDomain, settings: false })
-  }
-  tldSwitch = (tld) => {
-    let { tlds } = this.state;
-    tlds[tld] = !tlds[tld]
-    this.setState({ tlds })
-  }
-  settingsSwitch = () => {
-    const { settings } = this.state
-    this.setState({ settings: !settings })
-  }
-
-  check = async () => {
-    const response = await Api.get(`check/${this.props.domainWithTld}`)
-    this.setState({
-        loading: false,
-        available: !response.data.isTaken
-    })
-}
-  
-  wakeUpBackend = async () => {
-    const response = await Api.get('wake-up', { headers: { 'Cache-Control': 'no-cache' }})
-    if(response.data.success) this.setState({ backendAwake: true })
-  }
+    isLoadingComplete: false,
+  };
 
   render() {
-    const { settings, tlds,  history, activeHistory, loading, backendAwake } = this.state
-
-    if(!backendAwake) {
-      this.wakeUpBackend()
-      return (<Splash />)
-    }
-
-    return (
-      <View style={styles.container}>
-        <Header 
-          settings={settings}
-          settingsSwitch={this.settingsSwitch}
-          search={this.search}
-          tlds={tlds}
-          loading={loading}
-          tldSwitch={this.tldSwitch}
+    if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
+      return (
+        <AppLoading
+          startAsync={this._loadResourcesAsync}
+          onError={this._handleLoadingError}
+          onFinish={this._handleFinishLoading}
         />
-
-        <HistoryMenu history={history} activateHistory={this.activateHistory} activeHistory={activeHistory} deleteHistory={this.deleteHistory} />
-        
-        {(activeHistory) 
-          ? <CheckList domainInfo={history[activeHistory]} rawDomain={activeHistory} />
-          : <Text style={styles.nothingYet}>Nothing on your history yet.</Text>}
-      
-      </View>
-    );
+      );
+    } else {
+      return (
+        <View style={styles.container}>
+          {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+          <AppNavigator />
+        </View>
+      );
+    }
   }
+
+  _loadResourcesAsync = async () => {
+    return Promise.all([
+      Asset.loadAsync([
+        require('./assets/images/robot-dev.png'),
+        require('./assets/images/robot-prod.png'),
+      ]),
+      Font.loadAsync({
+        // This is the font that we are using for our tab bar
+        ...Icon.Ionicons.font,
+        // We include SpaceMono because we use it in HomeScreen.js. Feel free
+        // to remove this if you are not using it in your app
+        'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
+      }),
+    ]);
+  };
+
+  _handleLoadingError = error => {
+    // In this case, you might want to report the error to your error
+    // reporting service, for example Sentry
+    console.warn(error);
+  };
+
+  _handleFinishLoading = () => {
+    this.setState({ isLoadingComplete: true });
+  };
 }
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0
+    flex: 1,
+    backgroundColor: '#fff',
   },
-  nothingYet: {
-    alignSelf: 'center',
-    padding: 30
-  }
 });
