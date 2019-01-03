@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     },
     heroContainer: {
-        backgroundColor: 'rgba(0,0,0,0.04)',
+        // backgroundColor: 'rgba(0,0,0,0.04)',
         paddingTop: 70,
         paddingBottom: 20
     },
